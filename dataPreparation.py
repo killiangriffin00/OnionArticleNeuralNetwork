@@ -1,5 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import CountVectorizer
+
+#nltk.download('wordnet')
+#nltk.download('stopwords')
+#nltk.download('omw-1.4')
 
 def importData():
     rawData = []
@@ -13,7 +22,7 @@ def importData():
         rawData.append(buffer) 
         buffer = input.readline()
     
-    dataValueList = [()]
+    dataValueList = []
     debug = 0
     for x in rawData:
         split = x.split(',')
@@ -23,9 +32,36 @@ def importData():
             split.pop(0)
             split.pop(0)
             split.insert(0, combineElement)
-        dataValueList.append((split[0], split[1].strip("\n\",\'")))
+        dataValueList.append((re.sub('[\W_]', ' ', split[0]).strip().lower(), int(re.sub('[\W_]', ' ', split[1]).strip())))
     return dataValueList
+
+def cleanData(rawData):
+    stop_words = stopwords.words('english')
+    wnl = WordNetLemmatizer()
+    for count, value in enumerate(rawData):
+        split = value[0].split()
+        split = [wnl.lemmatize(valword) for valword in split if valword not in stop_words]
+        value = (' '.join(split), value[1])
+        rawData[count] = value
+    return rawData
+
+def bagOfWords(data):
+    cv = CountVectorizer()
+    X = cv.fit_transform([x[0] for x in data])
+    y = [x[1] for x in data]
+
+    return (cv, X, y)
+
+def getCleanData():
+    return cleanData(importData())
+
+def getBag():
+    return bagOfWords(getCleanData())
 
 if __name__ == "__main__":
     rawDataset = importData()
+    rawDataset = cleanData(rawDataset)
+    bag = bagOfWords(rawDataset)
+    feature = bag[0].get_feature_names_out()
+
     print(rawDataset)
