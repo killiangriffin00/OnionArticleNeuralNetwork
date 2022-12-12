@@ -32,6 +32,12 @@ def importData():
             split.pop(0)
             split.pop(0)
             split.insert(0, combineElement)
+
+        split[0] = split[0].split('|')[0]
+
+        if split[0].lower().find("the onion") != -1:
+            continue
+
         dataValueList.append((re.sub('[\W_]', ' ', split[0]).strip().lower(), int(re.sub('[\W_]', ' ', split[1]).strip())))
     return dataValueList
 
