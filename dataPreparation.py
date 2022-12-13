@@ -70,4 +70,8 @@ if __name__ == "__main__":
     bag = bagOfWords(rawDataset)
     feature = bag[0].get_feature_names_out()
 
+    with open("archive/cleanedData.csv", "w", encoding="utf-8") as f:
+        for text, label in rawDataset:
+            f.write(f"{text},{label}\n")
+
     print(rawDataset)
