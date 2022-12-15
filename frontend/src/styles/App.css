@@ -1,0 +1,19 @@
+.cur-txt {
+    padding-top: 20px;
+    padding-bottom: 30px;
+    text-align: center;
+    font-size: x-large;
+}
+
+.guess-txt {
+    font-size: large;
+    padding-top: 20px;
+    text-align: center;
+    min-height: 80px;
+}
+
+.final-txt {
+    padding-top: 30px;
+    text-align: center;
+    font-size: large;
+}

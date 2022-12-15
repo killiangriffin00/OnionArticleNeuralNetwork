@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
-import SatireButtons from './Buttons';
-import output from './output.csv';
+import SatireButtons from './SatireButtons';
+import output from './AlgorithmOutput.csv';
+import './styles/App.css';
 
 const NUM_ENTRIES_FOR_USER = 20;
 
 export default function App() {
     const [data, setData] = useState([]);
-    const [text, setText] = useState(null);
     const [current, setCurrent] = useState({ text: 'Loading...', guess: -1 });
     const [userChoices, setUserChoices] = useState([]);
     const [userScore, setUserScore] = useState(0);
     const [AIScore, setAIScore] = useState(0);
+    const [counter, setCounter] = useState(1);
 
     useEffect(() => {
         fetch(output)
@@ -31,6 +32,7 @@ export default function App() {
                     d.length
                 );
                 const randomData = randomEntries.map((index) => d[index]);
+                console.log(randomData);
                 setData(randomData);
                 setCurrent(randomData[0]);
             });
@@ -48,9 +50,10 @@ export default function App() {
     };
 
     useEffect(() => {
-        const index = userChoices.length + 1;
+        const index = userChoices.length;
         if (index < data.length) {
             setCurrent(data[index]);
+            setCounter(counter + 1);
             return;
         } else if (index === data.length) {
             getUserScore();
@@ -81,14 +84,17 @@ export default function App() {
 
     return (
         <div>
-            {current.text}
+            <div className="guess-txt">Guess: {counter}</div>
+            <div className="cur-txt">{current.text}</div>
             <SatireButtons
                 setChoices={setUserChoices}
                 choices={userChoices}
             />
-            {userChoices.length < data.length - 1
-                ? ''
-                : 'Your Score: ' + userScore + ', AI Score: ' + AIScore}
+            <div className="final-txt">
+                {userChoices.length < data.length
+                    ? ''
+                    : 'Your Score: ' + userScore + ', AI Score: ' + AIScore}
+            </div>
         </div>
     );
 }
