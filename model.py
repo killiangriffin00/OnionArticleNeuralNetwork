@@ -6,22 +6,25 @@ import dataPreparation as dp
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-data = dp.getCleanData()
+data = dp.importData()
+clean_data = dp.cleanData(data)
 
 MAXLEN = 100
 X = []
 y = []
 
-for (t, l) in data:
+data_map = {}
+for count, (t, l) in enumerate(clean_data):
     X.append(t)
     y.append(l)
+    data_map[t] = data[count][0]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train, X_test_text, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 tokenizer = Tokenizer(num_words=5000)
 tokenizer.fit_on_texts(X_train)
 X_train = tokenizer.texts_to_sequences(X_train)
-X_test = tokenizer.texts_to_sequences(X_test)
+X_test = tokenizer.texts_to_sequences(X_test_text)
 
 vocab_size = len(tokenizer.word_index) + 1
 
@@ -49,11 +52,20 @@ y_test = np.array(y_test)
 model.fit(
     X_train, 
     y_train, 
-    epochs=10, 
+    epochs=1, 
     verbose=1, 
     validation_data=(X_test, y_test), 
     batch_size=10
 )
+
+output = model.predict(X_test)
+
+file = open("archive/AlgorithmOutput.csv", 'w', encoding="UTF-8")
+for count, value in enumerate(X_test_text):
+    if output[count] > .5:
+        file.write(data_map[value] + ",1" + "," + str(y_test[count]) + "\n")
+    else:
+        file.write(data_map[value] + ",0" + "," + str(y_test[count]) + "\n")
 
 loss, accuracy = model.evaluate(X_train, y_train, verbose=1)
 print(f"Training Accuracy: {accuracy}")

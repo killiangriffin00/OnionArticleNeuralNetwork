@@ -38,18 +38,19 @@ def importData():
         if split[0].lower().find("the onion") != -1:
             continue
 
-        dataValueList.append((re.sub('[\W_]', ' ', split[0]).strip().lower(), int(re.sub('[\W_]', ' ', split[1]).strip())))
+        dataValueList.append((re.sub('\n', '', split[0]), int(re.sub('[\W_]', ' ', split[1]).strip())))
     return dataValueList
 
 def cleanData(rawData):
     stop_words = stopwords.words('english')
     wnl = WordNetLemmatizer()
-    for count, value in enumerate(rawData):
-        split = value[0].split()
+    clean = []
+    for value in rawData:
+        split = re.sub('[\W_]', ' ', value[0]).strip().lower().split()
         split = [wnl.lemmatize(valword) for valword in split if valword not in stop_words]
         value = (' '.join(split), value[1])
-        rawData[count] = value
-    return rawData
+        clean.append(value)
+    return clean
 
 def bagOfWords(data):
     cv = CountVectorizer()
